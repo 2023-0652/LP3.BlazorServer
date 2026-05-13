@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using MiProyectoAcademico.Domain.Constants;
+using LP3.BlazorServer.Domain.Constants;
 
-namespace MiProyectoAcademico.Domain.Constants;
+namespace LP3.BlazorServer.Domain.Constants;
 
 /// <summary>
 /// Reglas y límites del dominio académico.
