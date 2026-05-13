@@ -1,4 +1,4 @@
-using MiProyectoAcademico.Domain.Enums;
+using LP3.BlazorServer.Domain.Enums;
 
 namespace LP3.BlazorServer.Shared.DTOs;
 
