@@ -12,6 +12,7 @@ public static class ReglasDominio
     public const int NombreMaxLongitud      = 80;
     public const int MatriculaMaxLongitud   = 10;
     public const int MaxCursosPorPeriodo    = 6;
+    public const int CreditosMaxLongitud   = 80;
 
     // ── Calificaciones ────────────────────────────────────
     public const decimal CalificacionMinima = 0m;
