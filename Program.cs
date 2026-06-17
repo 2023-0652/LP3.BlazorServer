@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using LP3.BlazorServer.Components;
 using LP3.BlazorServer.Components.Account;
 using LP3.BlazorServer.Data;
+using LP3.BlazorServer.Application.Services;
+using LP3.BlazorServer.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,7 @@ builder.Services.AddRazorComponents()
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        builder.Services.AddScoped<EstudianteRepository, EstudianteRepository>();
+        builder.Services.AddScoped<IEstudianteService, EstudianteService>();
 
         builder.Services.AddAuthentication(options =>
             {

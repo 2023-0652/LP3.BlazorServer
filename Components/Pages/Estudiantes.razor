@@ -25,7 +25,6 @@
                 Buscar
             </button>
         </div>
-
         @if (estudianteBuscado != null)
         {
             <div class="alert alert-info mt-3">
@@ -34,7 +33,10 @@
                 (ID: @estudianteBuscado.Id)
             </div>
         }
-        <div class="card mb-4">
+    </div>
+
+    </div>
+<div class="card mb-4">
     <div class="card-body">
         <h4>➕ Registrar Nuevo Estudiante</h4>
         
@@ -84,7 +86,9 @@
                 @mensajeRegistro
             </div>
         }
-        <div class="card">
+    </div>
+</div>
+<div class="card">
     <div class="card-body">
         <h4>📊 Estudiantes Registrados (@estudiantes?.Count)</h4>
         
@@ -133,7 +137,12 @@
                 </table>
             </div>
         }
-        @if (editandoEstudiante != null)
+    </div>
+</div>
+
+
+@*Editar*@
+@if (editandoEstudiante != null)
 {
     <div class="card mt-4 border-warning">
         <div class="card-body">
@@ -157,8 +166,8 @@
                     </div>
                 </div>
 
-               @* <div class="row">
-                    <div class="col-md-6 mb-3">
+               <div class="row">
+                   @* <div class="col-md-6 mb-3">
                         <label for="email-edit" class="form-label">Email:</label>
                         <InputText id="email-edit" @bind-Value="editandoEstudiante.Email" 
                                    class="form-control" />
@@ -181,12 +190,30 @@
         </div>
     </div>
 }
+@*Eliminar*@
+@if (mostrarConfirmacionEliminar)
+{
+    <div class="card mt-4 border-danger">
+        <div class="card-body">
+            <div class="alert alert-danger" role="alert">
+                <h5>⚠️ Confirmar Eliminación</h5>
+                <p>¿Está seguro de que desea eliminar este estudiante?</p>
+                <p style="color: #721c24; font-size: 0.9em;">
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+                
+                <button class="btn btn-danger" @onclick="EliminarEstudiante">
+                    Sí, Eliminar Permanentemente
+                </button>
+                <button class="btn btn-secondary" @onclick="CancelarEliminar">
+                    Cancelar
+                </button>
+            </div>
+        </div>
     </div>
-</div>
-    </div>
-    </div>
-    </div>
-</div>
+}
+
+
 </div>
 @code {
     private async Task RegistrarEstudiante()
@@ -221,7 +248,34 @@
     // Variables para búsqueda
     private string matriculaBusqueda = string.Empty;
     private EstudianteDto? estudianteBuscado;
+    private void ConfirmarEliminar(int id)
+{
+    idEstudianteAEliminar = id;
+    mostrarConfirmacionEliminar = true;
+}
 
+private async Task EliminarEstudiante()
+{
+    bool resultado = await EstudianteService.DeleteAsync(idEstudianteAEliminar);
+
+    if (resultado)
+    {
+        mensajeRegistro = "✅ Estudiante eliminado exitosamente";
+        mostrarConfirmacionEliminar = false;
+        idEstudianteAEliminar = 0;
+        await CargarEstudiantes();
+    }
+    else
+    {
+        mensajeRegistro = "❌ Error al eliminar el estudiante";
+    }
+}
+
+private void CancelarEliminar()
+{
+    mostrarConfirmacionEliminar = false;
+    idEstudianteAEliminar = 0;
+}
     // Variables para nuevo registro
     private EstudianteDto nuevoEstudiante = new();
 
@@ -237,10 +291,63 @@
     {
         await CargarEstudiantes();
     }
+    private void CargarParaEditar(EstudianteDto estudiante)
+{
+    editandoEstudiante = new EstudianteDto
+    {
+        Id = estudiante.Id,
+        Nombre = estudiante.Nombre,
+        Apellido = estudiante.Apellido,
+        //Email = estudiante.Email,
+        Matricula = estudiante.Matricula
+    };
+    idEstudianteEditando = estudiante.Id;
+}
+
+private async Task GuardarCambios()
+{
+    if (editandoEstudiante == null) return;
+
+    bool resultado = await EstudianteService.UpdateAsync(idEstudianteEditando, editandoEstudiante);
+
+    if (resultado)
+    {
+        mensajeRegistro = "✅ Estudiante actualizado exitosamente";
+        editandoEstudiante = null;
+        idEstudianteEditando = 0;
+        await CargarEstudiantes();
+    }
+    else
+    {
+        mensajeRegistro = "❌ Error al actualizar el estudiante";
+    }
+}
+
+private void CancelarEdicion()
+{
+    editandoEstudiante = null;
+    idEstudianteEditando = 0;
+}
 
     private async Task CargarEstudiantes()
     {
         estudiantes = await EstudianteService.GetAll();
     }
+
+     private async Task BuscarPorMatricula()
+{
+    if (string.IsNullOrWhiteSpace(matriculaBusqueda))
+    {
+        mensajeRegistro = "Por favor ingresa una matrícula";
+        return;
+    }
+
+    estudianteBuscado = await EstudianteService.GetByMatriculaAsync(matriculaBusqueda);
+    
+    if (estudianteBuscado == null)
+    {
+        mensajeRegistro = "❌ No se encontró un estudiante con esa matrícula";
+    }
+}
 
 }
